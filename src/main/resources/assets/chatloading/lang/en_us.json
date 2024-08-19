@@ -1,2 +1,8 @@
 {
+  "chat.chatloading.load.success": "Success loaded %s chunks",
+  "chat.chatloading.bind.success": "Binding successful",
+  "chat.chatloading.bind.failed": "Binding failed",
+  "chat.chatloading.bind.needplayer": "Binding needs a player hold the WirelessTerminal",
+  "chat.chatloading.unbind.success": "Unbinding successful",
+  "chat.chatloading.unbind.failed": "Unbinding failed"
 }

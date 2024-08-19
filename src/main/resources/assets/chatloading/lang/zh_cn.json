@@ -1,2 +1,7 @@
 {
+  "chat.chatloading.load.success": "成功加载%s个区块",
+  "chat.chatloading.bind.failed": "绑定失败",
+  "chat.chatloading.bind.needplayer": "需要一个玩家手持无线终端来绑定",
+  "chat.chatloading.unbind.success": "解绑成功",
+  "chat.chatloading.unbind.failed": "解绑失败"
 }

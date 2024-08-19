@@ -2,6 +2,7 @@
 package simba.chatloading.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 
@@ -11,12 +12,11 @@ import static net.minecraft.commands.Commands.literal;
 public class CommandEvent {
 
     public static final String BIND_KEY = "bindKey";
-
-    static final String TAG_ACCESS_POINT_POS = "accessPoint";
+    public static final String LOAD_LEN = "loadLen";
 
     public static void InitialCommand(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
-                literal("chatae2")
+                literal("chatloading")
                         .then(argument( BIND_KEY,
                                 StringArgumentType.string())
                                 .then(literal("bind")
@@ -24,6 +24,11 @@ public class CommandEvent {
                                 )
                                 .then(literal("unbind").requires(source -> source.hasPermission(2))
                                         .executes(UnbindCommand::UnbindExecute)
+                                )
+                                .then(literal("load").requires(source -> source.hasPermission(2))
+                                        .executes(LoadCommand::LoadExecute)
+                                        .then(argument( LOAD_LEN,
+                                                IntegerArgumentType.integer()))
                                 )
                         )
                         .then(literal("list").requires(source -> source.hasPermission(2))

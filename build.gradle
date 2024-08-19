@@ -15,14 +15,24 @@ repositories {
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
 	maven {
-		name "Modmaven"
-		url "https://modmaven.dev/"
-		// For Gradle 5.1 and above, limit it to just AE2
+		url "https://maven.saps.dev/releases"
 		content {
-			includeGroup 'appeng'
+			includeGroup "dev.ftb.mods"
 		}
 	}
 	maven { url "https://maven.shedaniel.me" }
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "Modrinth"
+				url = "https://api.modrinth.com/maven"
+			}
+		}
+		forRepositories(fg.repository) // Only add this if you're using ForgeGradle, otherwise remove this line
+		filter {
+			includeGroup "maven.modrinth"
+		}
+	}
 }
 
 minecraft {
@@ -82,6 +92,14 @@ dependencies {
 	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 	annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
 
+	compileOnly fg.deobf("maven.modrinth:impactor:$impactorVersion")
+	runtimeOnly fg.deobf("maven.modrinth:impactor:$impactorVersion")
+
+	compileOnly("dev.ftb.mods:ftb-chunks-forge:${ftbchunkVersion}")
+	runtimeOnly("dev.ftb.mods:ftb-chunks-forge:${ftbchunkVersion}")
+
+	compileOnly("dev.ftb.mods:ftb-teams-forge:${ftbteamsVersion}")
+	runtimeOnly("dev.ftb.mods:ftb-teams-forge:${ftbteamsVersion}")
 }
 
 mixin {
