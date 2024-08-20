@@ -92,20 +92,14 @@ dependencies {
 	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 	annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
 
-	compileOnly fg.deobf("maven.modrinth:impactor:$impactorVersion")
-	runtimeOnly fg.deobf("maven.modrinth:impactor:$impactorVersion")
+	implementation fg.deobf("maven.modrinth:impactor:$impactorVersion")
+	implementation fg.deobf("dev.ftb.mods:ftb-chunks-forge:${ftbchunkVersion}")
+	implementation fg.deobf("dev.ftb.mods:ftb-teams-forge:${ftbteamsVersion}")
+	implementation fg.deobf("dev.ftb.mods:ftb-library-forge:${ftblibraryVersion}") {
+		transitive = false
+	}
+	implementation fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
 
-	compileOnly("dev.ftb.mods:ftb-chunks-forge:${ftbchunkVersion}")
-	runtimeOnly("dev.ftb.mods:ftb-chunks-forge:${ftbchunkVersion}")
-
-	compileOnly("dev.ftb.mods:ftb-teams-forge:${ftbteamsVersion}")
-	runtimeOnly("dev.ftb.mods:ftb-teams-forge:${ftbteamsVersion}")
-}
-
-mixin {
-	// MixinGradle 设置
-	add sourceSets.main, 'mixins.chatloading.refmap.json'
-	config 'chatloading.mixins.json'
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
