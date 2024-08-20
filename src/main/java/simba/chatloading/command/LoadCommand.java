@@ -8,6 +8,7 @@ import dev.ftb.mods.ftbchunks.api.FTBChunksAPI;
 import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
 import dev.ftb.mods.ftbteams.api.Team;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
@@ -25,32 +26,35 @@ import static simba.chatloading.command.CommandEvent.LOAD_LEN;
 public class LoadCommand {
 
     public static int LoadExecute(CommandContext<CommandSourceStack> context) {
-        if (context.getSource().isPlayer()) {
-            String bindKey = context.getArgument(BIND_KEY, String.class);
-            int loadLength = context.getArgument(LOAD_LEN, Integer.class);
-            UUID playerUUID = BindData.BindInstance.Bind_data.get(bindKey).FUUID;
-            Optional<Team> teamOptional = FTBTeamsAPI.api().getManager().getTeamForPlayerID(playerUUID);
-            if (teamOptional.isEmpty()) return 1;
-            UUID teamUUID = teamOptional.get().getTeamId();
-            TicketType<ChunkPos> Load = TicketType.create("chatae2:context", Comparator.comparingLong(ChunkPos::toLong), loadLength);
-            AtomicInteger loaded = new AtomicInteger(0);
-            FTBChunksAPI.api().getManager().getAllClaimedChunks().stream()
-                    .filter(cc -> cc.getTeamData().getTeam().getTeamId().equals(teamUUID))
-                    .filter(ClaimedChunk::isForceLoaded)
-                    .forEach(cc -> {
-                        ServerLevel level = context.getSource().getServer().getLevel(cc.getPos().dimension());
-                        if (level != null) {
-                            ChunkPos chunkPos = cc.getPos().getChunkPos();
-                            level.getChunkSource().addRegionTicket(Load, chunkPos, 1, chunkPos, true);
-                            loaded.incrementAndGet();
-                        }
-                    });
-            context.getSource().sendSuccess(() -> Component.translatable("chat.chatloading.load.success", loaded.get()), false);
-            return 1;
-        } else {
-            context.getSource().sendSuccess(() -> Component.literal("Cannot Execute from console"), false);
+        String bindKey = context.getArgument(BIND_KEY, String.class);
+        int loadLength = context.getArgument(LOAD_LEN, Integer.class);
+        BindData.Tuple3<Tag, UUID, String> bindData = BindData.BindInstance.Bind_data.get(bindKey);
+        if (bindData == null) {
+            context.getSource().sendSuccess(() -> Component.literal("Bind data not found"), false);
+            return 0;
         }
-        return 0;
+        UUID playerUUID = bindData.FUUID;
+        Optional<Team> teamOptional = FTBTeamsAPI.api().getManager().getTeamForPlayerID(playerUUID);
+        if (teamOptional.isEmpty()) {
+            context.getSource().sendSuccess(() -> Component.literal("Team not found"), false);
+            return 0;
+        }
+        UUID teamUUID = teamOptional.get().getTeamId();
+        TicketType<ChunkPos> Load = TicketType.create("chatae2:context", Comparator.comparingLong(ChunkPos::toLong), loadLength);
+        AtomicInteger loaded = new AtomicInteger(0);
+        FTBChunksAPI.api().getManager().getAllClaimedChunks().stream()
+                .filter(cc -> cc.getTeamData().getTeam().getTeamId().equals(teamUUID))
+                .filter(ClaimedChunk::isForceLoaded)
+                .forEach(cc -> {
+                    ServerLevel level = context.getSource().getServer().getLevel(cc.getPos().dimension());
+                    if (level != null) {
+                        ChunkPos chunkPos = cc.getPos().getChunkPos();
+                        level.getChunkSource().addRegionTicket(Load, chunkPos, 1, chunkPos, true);
+                        loaded.incrementAndGet();
+                    }
+                });
+        context.getSource().sendSuccess(() -> Component.translatable("chat.chatloading.load.success", loaded.get()), false);
+        return loaded.get();
     }
 
 }
