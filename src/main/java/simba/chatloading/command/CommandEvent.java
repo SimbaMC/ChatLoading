@@ -26,9 +26,9 @@ public class CommandEvent {
                                         .executes(UnbindCommand::UnbindExecute)
                                 )
                                 .then(literal("load").requires(source -> source.hasPermission(2))
-                                        .executes(LoadCommand::LoadExecute)
-                                        .then(argument( LOAD_LEN,
-                                                IntegerArgumentType.integer()))
+                                        .then(argument( LOAD_LEN, IntegerArgumentType.integer(0, 1000000))
+                                            .executes(LoadCommand::LoadExecute)
+                                        )
                                 )
                         )
                         .then(literal("list").requires(source -> source.hasPermission(2))

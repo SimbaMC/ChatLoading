@@ -17,6 +17,7 @@ import simba.chatloading.config.BindData;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static simba.chatloading.command.CommandEvent.BIND_KEY;
 import static simba.chatloading.command.CommandEvent.LOAD_LEN;
@@ -32,6 +33,7 @@ public class LoadCommand {
             if (teamOptional.isEmpty()) return 1;
             UUID teamUUID = teamOptional.get().getTeamId();
             TicketType<ChunkPos> Load = TicketType.create("chatae2:context", Comparator.comparingLong(ChunkPos::toLong), loadLength);
+            AtomicInteger loaded = new AtomicInteger(0);
             FTBChunksAPI.api().getManager().getAllClaimedChunks().stream()
                     .filter(cc -> cc.getTeamData().getTeam().getTeamId().equals(teamUUID))
                     .filter(ClaimedChunk::isForceLoaded)
@@ -40,9 +42,10 @@ public class LoadCommand {
                         if (level != null) {
                             ChunkPos chunkPos = cc.getPos().getChunkPos();
                             level.getChunkSource().addRegionTicket(Load, chunkPos, 1, chunkPos, true);
+                            loaded.incrementAndGet();
                         }
                     });
-            context.getSource().sendSuccess(() -> Component.translatable("chat.chatloading.load.success"), false);
+            context.getSource().sendSuccess(() -> Component.translatable("chat.chatloading.load.success", loaded.get()), false);
             return 1;
         } else {
             context.getSource().sendSuccess(() -> Component.literal("Cannot Execute from console"), false);
