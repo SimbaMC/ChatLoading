@@ -15,6 +15,7 @@ public class BindCommand {
         if (context.getSource().isPlayer()) {
             String bindKey = context.getArgument(BIND_KEY, String.class);
             BindInstance.Bind(bindKey, IntTag.valueOf(0), context.getSource().getPlayer().getUUID());
+            context.getSource().sendSuccess(() -> Component.translatable("chat.chatloading.bind.success"), false);
             return 1;
         } else {
             context.getSource().sendSuccess(() -> Component.literal("Cannot Execute from console"), false);
