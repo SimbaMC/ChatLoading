@@ -24,7 +24,7 @@ import static simba.chatloading.command.CommandEvent.BIND_KEY;
 import static simba.chatloading.command.CommandEvent.LOAD_LEN;
 
 public class LoadCommand {
-
+    static final TicketType<ChunkPos> STATIC_LOAD = TicketType.create("chatae2:context", Comparator.comparingLong(ChunkPos::toLong), 100000);
     public static int LoadExecute(CommandContext<CommandSourceStack> context) {
         String bindKey = context.getArgument(BIND_KEY, String.class);
         int loadLength = context.getArgument(LOAD_LEN, Integer.class);
@@ -49,7 +49,7 @@ public class LoadCommand {
                     ServerLevel level = context.getSource().getServer().getLevel(cc.getPos().dimension());
                     if (level != null) {
                         ChunkPos chunkPos = cc.getPos().getChunkPos();
-                        level.getChunkSource().addRegionTicket(Load, chunkPos, 1, chunkPos, true);
+                        level.getChunkSource().addRegionTicket(STATIC_LOAD, chunkPos, 1, chunkPos, true);
                         loaded.incrementAndGet();
                     }
                 });

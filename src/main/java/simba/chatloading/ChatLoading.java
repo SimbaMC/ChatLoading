@@ -1,13 +1,19 @@
 /* SPDX-License-Identifier: AGPL-3.0 WITH SimbaMC Proxy and SimbaMC Exceptions */
 package simba.chatloading;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
+import com.mojang.brigadier.CommandDispatcher;
+import dev.architectury.event.events.common.CommandRegistrationEvent;
+import dev.architectury.event.events.common.LifecycleEvent;
+import dev.architectury.event.events.common.TickEvent;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import simba.chatloading.command.CommandEvent;
+import simba.chatloading.command.TickTask;
 import simba.chatloading.config.BindData;
 import simba.chatloading.config.Config;
 
@@ -20,18 +26,19 @@ public class ChatLoading {
 	public static Config config;
 
 	public ChatLoading() {
-		MinecraftForge.EVENT_BUS.addListener(this::onServerStarting);
-		MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
+		LifecycleEvent.SERVER_STARTING.register(this::onServerStarting);
+		CommandRegistrationEvent.EVENT.register(this::onRegisterCommands);
+		TickEvent.SERVER_POST.register(TickTask::onTick);
 	}
 
-	public void onServerStarting(ServerStartedEvent event) {
+	public void onServerStarting(MinecraftServer server) {
 		// This method will be called when the server is starting
 		config = Config.onStart();
-		BindData.BindInstance = BindData.getServerState(event.getServer());
+		BindData.BindInstance = BindData.getServerState(server);
 	}
 
-	public void onRegisterCommands(RegisterCommandsEvent event) {
+	public void onRegisterCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registry, Commands.CommandSelection selection) {
 		// This method will be called when commands are being registered
-		CommandEvent.InitialCommand(event.getDispatcher());
+		CommandEvent.InitialCommand(dispatcher);
 	}
 }
