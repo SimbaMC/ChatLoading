@@ -3,7 +3,6 @@ package simba.chatloading.command;
 
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import simba.chatloading.config.BindData;
 
@@ -14,10 +13,10 @@ import static simba.chatloading.config.BindData.BindInstance;
 
 public class ListCommand {
     public static int ListExecute(CommandContext<CommandSourceStack> context) {
-        for(Map.Entry<String, BindData.Tuple3<Tag, UUID, String>> entry : BindInstance.Bind_data.entrySet()) {
+        for(Map.Entry<String, BindData.Tuple3<Integer, UUID, String>> entry : BindInstance.Bind_data.entrySet()) {
             context.getSource().sendSuccess(() -> Component.literal(
                     entry.getKey() + " " +
-                            entry.getValue().FTag + " " +
+                            entry.getValue().FInt + " " +
                             entry.getValue().FUUID + " " +
                             entry.getValue().FLang
             ), false);

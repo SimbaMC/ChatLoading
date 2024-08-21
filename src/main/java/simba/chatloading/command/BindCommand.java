@@ -3,7 +3,6 @@ package simba.chatloading.command;
 
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.nbt.IntTag;
 import net.minecraft.network.chat.Component;
 
 import static simba.chatloading.command.CommandEvent.BIND_KEY;
@@ -14,7 +13,7 @@ public class BindCommand {
     public static int BindExecute(CommandContext<CommandSourceStack> context) {
         if (context.getSource().isPlayer()) {
             String bindKey = context.getArgument(BIND_KEY, String.class);
-            BindInstance.Bind(bindKey, IntTag.valueOf(0), context.getSource().getPlayer().getUUID());
+            BindInstance.Bind(bindKey, 0, context.getSource().getPlayer().getUUID());
             context.getSource().sendSuccess(() -> Component.translatable("chat.chatloading.bind.success"), false);
             return 1;
         } else {

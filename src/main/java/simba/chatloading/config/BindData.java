@@ -3,8 +3,6 @@ package simba.chatloading.config;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -19,19 +17,19 @@ import java.util.UUID;
 
 public class BindData extends SavedData {
 
-    public Map<String, Tuple3<Tag, UUID, String>> Bind_data;
-    public static class Tuple3<TTag, TUUID, TString> {
-        public TTag FTag;
+    public Map<String, Tuple3<Integer, UUID, String>> Bind_data;
+    public static class Tuple3<TInt, TUUID, TString> {
+        public TInt FInt;
         public TUUID FUUID;
         public TString FLang;
-        Tuple3(TTag FTag, TUUID FUUID, TString FLang) {
-            this.FTag = FTag;
+        Tuple3(TInt FInt, TUUID FUUID, TString FLang) {
+            this.FInt = FInt;
             this.FUUID = FUUID;
             this.FLang = FLang;
         }
     }
 
-    private static final String NBT_BIND_KEY = "BIND";
+    private static final String NBT_LOAD_KEY = "BIND";
     private static final String NBT_LANG_KEY = "LANG";
     private static final String NBT_UUID_KEY = "UUID";
 
@@ -53,8 +51,8 @@ public class BindData extends SavedData {
                 ChatLoading.MODID);
     }
 
-    public void Bind(String BindKey, Tag GridKey, UUID playerUUID) {
-        Bind_data.put(BindKey, new Tuple3<>(GridKey, playerUUID, ChatLoading.config.getGLOBAL_LANGUAGE()));
+    public void Bind(String BindKey, int LoadLength, UUID playerUUID) {
+        Bind_data.put(BindKey, new Tuple3<>(LoadLength, playerUUID, ChatLoading.config.getGLOBAL_LANGUAGE()));
         this.setDirty();
     }
 
@@ -68,11 +66,21 @@ public class BindData extends SavedData {
         }
     }
 
-    public Optional<Tag> Query(String BindKey) {
+    public Optional<Integer> Query(String BindKey) {
         if (this.Bind_data.containsKey(BindKey)) {
-            return Optional.of(this.Bind_data.get(BindKey).FTag);
+            return Optional.of(this.Bind_data.get(BindKey).FInt);
         } else {
             return Optional.empty();
+        }
+    }
+
+    public boolean setLength(String BindKey, int loadLength) {
+        if (this.Bind_data.containsKey(BindKey)) {
+            this.Bind_data.get(BindKey).FInt = loadLength;
+            this.setDirty();
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -88,13 +96,13 @@ public class BindData extends SavedData {
         BindData bindData = new BindData();
         for (String nbtKey : tag.getAllKeys()) {
             CompoundTag keyData = tag.getCompound(nbtKey);
-            Tag Bindtag;
+            int loadLength;
             UUID BindUUID;
             String BindLang;
-            if (keyData.contains(NBT_BIND_KEY)) {
-                Bindtag = keyData.get(NBT_BIND_KEY);
+            if (keyData.contains(NBT_LOAD_KEY)) {
+                loadLength = keyData.getInt(NBT_LOAD_KEY);
             } else {
-                Bindtag = StringTag.valueOf("");
+                loadLength = 0;
             }
             BindUUID = keyData.getUUID(NBT_UUID_KEY);
             if (tag.contains(NBT_LANG_KEY)) {
@@ -102,18 +110,18 @@ public class BindData extends SavedData {
             } else {
                 BindLang = ChatLoading.config.getGLOBAL_LANGUAGE();
             }
-            bindData.Bind_data.put(nbtKey, new Tuple3<>(Bindtag, BindUUID, BindLang));
+            bindData.Bind_data.put(nbtKey, new Tuple3<>(loadLength, BindUUID, BindLang));
         }
         return bindData;
     }
 
     @Override @MethodsReturnNonnullByDefault
     public @NotNull CompoundTag save(@NotNull CompoundTag nbt) {
-        for(Map.Entry<String, Tuple3<Tag, UUID, String>> entry : Bind_data.entrySet()) {
+        for(Map.Entry<String, Tuple3<Integer, UUID, String>> entry : Bind_data.entrySet()) {
             CompoundTag keyData = new CompoundTag();
-            keyData.put(NBT_BIND_KEY, entry.getValue().FTag);
+            keyData.putInt(NBT_LOAD_KEY, entry.getValue().FInt);
             keyData.putUUID(NBT_UUID_KEY, entry.getValue().FUUID);
-            keyData.putString(NBT_BIND_KEY, entry.getValue().FLang);
+            keyData.putString(NBT_LANG_KEY, entry.getValue().FLang);
             nbt.put(entry.getKey(), keyData);
         }
         return nbt;
