@@ -47,7 +47,7 @@ public class TickTask {
                     ServerLevel level = minecraftServer.getLevel(cc.getPos().dimension());
                     if (level != null) {
                         ChunkPos chunkPos = cc.getPos().getChunkPos();
-                        level.getChunkSource().addRegionTicket(STATIC_LOAD, chunkPos, 1, chunkPos, true);
+                        level.getChunkSource().addRegionTicket(STATIC_LOAD, chunkPos, 2, chunkPos, true);
                         loaded.incrementAndGet();
                     }
                 });
